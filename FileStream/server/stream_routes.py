@@ -11,7 +11,14 @@ from FileStream.server.exceptions import FIleNotFound, InvalidHash
 from FileStream import utils, StartTime, __version__
 from FileStream.utils.render_template import render_page
 
+import os
+
 routes = web.RouteTableDef()
+
+@routes.get("/logo.png", allow_head=True)
+async def logo_handler(_):
+    logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "template", "logo.png")
+    return web.FileResponse(logo_path)
 
 @routes.get("/status", allow_head=True)
 async def root_route_handler(_):
