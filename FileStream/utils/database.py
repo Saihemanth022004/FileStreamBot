@@ -12,7 +12,6 @@ class Database:
         self.col = self.db.users
         self.black = self.db.blacklist
         self.file = self.db.file
-        self.playlist = self.db.playlist
 
 #---------------------[ NEW USER ]---------------------#
     def new_user(self, id):
@@ -133,30 +132,4 @@ class Database:
             await self.col.update_one({"id": id}, {"$inc": {"Links": -1}})
         elif operation == "+":
             await self.col.update_one({"id": id}, {"$inc": {"Links": 1}})
-
-# ---------------------[ PLAYLIST DATABASE ]---------------------#
-    async def create_playlist(self, user_id, title):
-        playlist = {
-            "user_id": user_id,
-            "title": title,
-            "files": [],
-            "time": time.time()
-        }
-        return (await self.playlist.insert_one(playlist)).inserted_id
-
-    async def add_file_to_playlist(self, user_id, playlist_name, file_id):
-        playlist = await self.playlist.find_one({"user_id": user_id, "title": playlist_name})
-        if not playlist:
-            return False
-        await self.playlist.update_one({"_id": playlist["_id"]}, {"$push": {"files": str(file_id)}})
-        return True
-
-    async def get_playlist(self, playlist_id):
-        try:
-            return await self.playlist.find_one({"_id": ObjectId(playlist_id)})
-        except InvalidId:
-            return None
-
-    async def get_my_playlists(self, user_id):
-        cursor = self.playlist.find({"user_id": user_id})
-        return await cursor.to_list(length=100)
+

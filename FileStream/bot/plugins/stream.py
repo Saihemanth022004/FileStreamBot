@@ -10,7 +10,6 @@ from pyrogram.errors import FloodWait
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums.parse_mode import ParseMode
 db = Database(Telegram.DATABASE_URL, Telegram.SESSION_NAME)
-media_groups = {}
 
 @FileStream.on_message(
     filters.private
@@ -34,36 +33,6 @@ async def private_receive_handler(bot: Client, message: Message):
     await is_user_exist(bot, message)
     if Telegram.FORCE_SUB:
         if not await is_user_joined(bot, message):
-            return
-            
-    if message.media_group_id:
-        m_id = message.media_group_id
-        if m_id not in media_groups:
-            media_groups[m_id] = [message]
-            await asyncio.sleep(2.5) # Wait for all messages in the group
-            
-            msgs = media_groups[m_id]
-            del media_groups[m_id]
-            
-            title = f"Batch {message.date.strftime('%Y-%m-%d %H:%M')}"
-            playlist_id = await db.create_playlist(message.from_user.id, title)
-            
-            for msg in msgs:
-                try:
-                    inserted_id = await db.add_file(get_file_info(msg))
-                    await get_file_ids(False, inserted_id, multi_clients, msg)
-                    await db.add_file_to_playlist(message.from_user.id, title, inserted_id)
-                except Exception:
-                    pass
-            
-            markup = InlineKeyboardMarkup([
-                [InlineKeyboardButton("📺 Generate Playlist Link", callback_data=f"grouppl_{playlist_id}")],
-                [InlineKeyboardButton("🔗 Give Individual Links", callback_data=f"groupind_{playlist_id}")]
-            ])
-            await message.reply_text(f"You sent **{len(msgs)} files** at once.\nDo you want a single Playlist link or separate individual links?", reply_markup=markup)
-            return
-        else:
-            media_groups[m_id].append(message)
             return
 
     try:

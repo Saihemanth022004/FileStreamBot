@@ -47,9 +47,6 @@ async def start_services():
         BotCommand("start", "Start the bot"),
         BotCommand("help", "Get help menu"),
         BotCommand("about", "About the bot"),
-        BotCommand("create_playlist", "Create a new playlist"),
-        BotCommand("my_playlists", "View your playlists"),
-        BotCommand("get_playlist", "Get playlist link"),
         BotCommand("files", "View your uploaded files")
     ])
     

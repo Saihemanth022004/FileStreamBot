@@ -111,8 +111,10 @@
 
         .video-container {
             width: 100%;
-            background: #000;
+            background: #111;
             line-height: 0;
+            position: relative;
+            touch-action: manipulation; /* Solves mobile zoom bug for double-taps */
         }
 
         .video-container video {
@@ -120,11 +122,29 @@
             display: block;
         }
 
-        /* Plyr customization */
+        /* Plyr customization to match sleek reference UI */
         :root {
-            --plyr-color-main: #ff0000;
-            --plyr-video-control-color: #fff;
-            --plyr-video-control-background: rgba(0,0,0,0.6);
+            --plyr-color-main: #3b82f6; /* Sleek Blue Progress Bar */
+            --plyr-video-control-color: #f9fafb; /* White Icons */
+            --plyr-video-control-background: transparent;
+            --plyr-video-control-background-hover: rgba(255, 255, 255, 0.1);
+            --plyr-video-controls-background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.85));
+            --plyr-control-icon-size: 20px;
+        }
+
+        .plyr__control--overlaid {
+            background: rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            transition: all 0.2s ease !important;
+        }
+        .plyr__control--overlaid svg {
+            fill: #fff !important;
+            width: 28px !important;
+        }
+        .plyr__control--overlaid:hover {
+            background: rgba(255, 255, 255, 0.3) !important;
+            transform: scale(1.05) !important;
         }
 
         /* File Info */
@@ -497,42 +517,43 @@
     <!-- Scripts -->
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
-        // Initialize Plyr with all advanced features enabled
         const player = new Plyr('#player', {
             controls: [
-                'play-large',   // The large play button in the center
-                'restart',      // Restart playback from the beginning
-                'rewind',       // Rewind by 10 seconds
-                'play',         // Play/pause playback
-                'fast-forward', // Fast forward by 10 seconds
-                'progress',     // The progress bar and scrubber
-                'current-time', // The current time of playback
-                'duration',     // The full duration of the media
-                'mute',         // Toggle mute
-                'volume',       // Volume control
-                'settings',     // Settings menu (speed, quality)
-                'pip',          // Picture-in-picture mode
-                'fullscreen'    // Toggle fullscreen
+                'play-large',   // The overlaid play button
+                'play',         // Bottom left play/pause
+                'current-time', // 25:37
+                'duration',     // / 52:00
+                'progress',     // Middle Blue Scrubber
+                'settings',     // Cog
+                'pip',          // Picture-in-picture
+                'fullscreen',   // Arrows
+                'mute'          // Volume toggle at right
             ],
-            seekTime: 10,       // Fast forward/rewind time in seconds
-            keyboard: { focused: true, global: true }, // Enable keyboard shortcuts
-            tooltips: { controls: true, seek: true }   // Show helpful tooltips on hover
+            seekTime: 10,
+            keyboard: { focused: true, global: true },
+            tooltips: { controls: true, seek: true }
         });
 
-        // Mobile double-tap to seek functionality
+        // Robust cross-platform Double-Tap to Seek fix
         let lastTap = 0;
-        document.querySelector('.video-container').addEventListener('touchend', function(e) {
+        document.querySelector('.video-container').addEventListener('click', function(e) {
+            // Ignore clicks directly on control buttons
+            if (e.target.closest('.plyr__controls')) return;
+
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
             
             if (tapLength < 300 && tapLength > 0) {
-                const touchX = e.changedTouches[0].clientX;
-                const containerRect = this.getBoundingClientRect();
+                // Determine left or right side click
+                const rect = this.getBoundingClientRect();
+                const tapX = e.clientX || (e.changedTouches ? e.changedTouches[0].clientX : 0);
                 
-                if (touchX > containerRect.left + (containerRect.width / 2)) {
-                    player.forward(10); // Right side: Forward 10s
+                if (tapX > rect.left + (rect.width / 2)) {
+                    player.forward(10);
+                    showToast('⏩ 10s');
                 } else {
-                    player.rewind(10);  // Left side: Rewind 10s
+                    player.rewind(10);
+                    showToast('⏪ 10s');
                 }
             }
             lastTap = currentTime;
