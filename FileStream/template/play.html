@@ -492,26 +492,11 @@
 
         function vlc_player() {
             const isAndroid = /Android/i.test(navigator.userAgent);
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
             if (isAndroid) {
                 window.location.href = `intent:${streamlink}#Intent;package=org.videolan.vlc;type=video/*;end`;
-            } else if (isIOS) {
-                window.location.href = `vlc://${streamlink}`;
             } else {
-                // For PC, vlc:// protocol is often unregistered.
-                // We generate a tiny .m3u playlist file which auto-opens in VLC or default media player.
-                const m3uContent = `#EXTM3U\n#EXTINF:-1,${'{{file_name}}'}\n${streamlink}`;
-                const blob = new Blob([m3uContent], { type: 'audio/x-mpegurl' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = '{{file_name}}.m3u';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showToast('Playlist downloaded! Open the .m3u file in VLC or your default player.');
+                window.location.href = `vlc://${streamlink}`;
             }
         }
 
