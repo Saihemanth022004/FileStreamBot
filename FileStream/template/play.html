@@ -19,48 +19,15 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #07070d;
+            background: #07070d radial-gradient(circle at 15% 50px, rgba(108, 60, 224, 0.15), transparent 40%),
+                        radial-gradient(circle at 85% 90%, rgba(33, 150, 243, 0.15), transparent 40%);
+            background-attachment: fixed;
             color: #e4e4ed;
             min-height: 100vh;
             overflow-x: hidden;
         }
 
-        /* Animated background orbs */
-        body::before,
-        body::after {
-            content: '';
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.35;
-            z-index: 0;
-            pointer-events: none;
-        }
-        body::before {
-            width: 500px;
-            height: 500px;
-            background: #6c3ce0;
-            top: -120px;
-            left: -100px;
-            animation: floatOrb1 12s ease-in-out infinite alternate;
-        }
-        body::after {
-            width: 400px;
-            height: 400px;
-            background: #2196f3;
-            bottom: -80px;
-            right: -80px;
-            animation: floatOrb2 10s ease-in-out infinite alternate;
-        }
 
-        @keyframes floatOrb1 {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(60px, 80px) scale(1.15); }
-        }
-        @keyframes floatOrb2 {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(-50px, -60px) scale(1.1); }
-        }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
@@ -102,6 +69,7 @@
             font-weight: 700;
             background: linear-gradient(135deg, #a78bfa, #6c3ce0);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: 1.5px;
             text-transform: uppercase;
@@ -224,6 +192,7 @@
             text-decoration: none;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            will-change: transform;
         }
 
         .action-btn svg {
@@ -527,7 +496,7 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                showToast('Playlist downloaded! Open it to play in VLC.');
+                showToast('Playlist downloaded! Open the .m3u file in VLC or your default player.');
             }
         }
 

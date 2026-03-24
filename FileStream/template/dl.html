@@ -18,7 +18,9 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #07070d;
+            background: #07070d radial-gradient(circle at 15% 50px, rgba(108, 60, 224, 0.15), transparent 40%),
+                        radial-gradient(circle at 85% 90%, rgba(33, 150, 243, 0.15), transparent 40%);
+            background-attachment: fixed;
             color: #e4e4ed;
             min-height: 100vh;
             display: flex;
@@ -26,43 +28,6 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-        }
-
-        /* Animated background orbs */
-        body::before,
-        body::after {
-            content: '';
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.35;
-            z-index: 0;
-            pointer-events: none;
-        }
-        body::before {
-            width: 450px;
-            height: 450px;
-            background: #6c3ce0;
-            top: -100px;
-            left: -80px;
-            animation: floatOrb1 12s ease-in-out infinite alternate;
-        }
-        body::after {
-            width: 350px;
-            height: 350px;
-            background: #2196f3;
-            bottom: -60px;
-            right: -60px;
-            animation: floatOrb2 10s ease-in-out infinite alternate;
-        }
-
-        @keyframes floatOrb1 {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(50px, 70px) scale(1.12); }
-        }
-        @keyframes floatOrb2 {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(-40px, -50px) scale(1.08); }
         }
 
         @keyframes fadeInUp {
@@ -109,6 +74,7 @@
             font-weight: 700;
             background: linear-gradient(135deg, #a78bfa, #6c3ce0);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: 1.5px;
             text-transform: uppercase;
