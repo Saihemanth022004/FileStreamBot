@@ -50,6 +50,18 @@ async def stream_handler(request: web.Request):
     except (AttributeError, BadStatusLine, ConnectionResetError):
         pass
 
+@routes.get("/playlist/{path}", allow_head=True)
+async def playlist_handler(request: web.Request):
+    try:
+        path = request.match_info["path"]
+        from FileStream.utils.render_template import render_playlist_page
+        return web.Response(text=await render_playlist_page(path), content_type='text/html')
+    except InvalidHash as e:
+        raise web.HTTPForbidden(text=e.message)
+    except FIleNotFound as e:
+        raise web.HTTPNotFound(text=e.message)
+    except (AttributeError, BadStatusLine, ConnectionResetError):
+        pass
 
 @routes.get("/dl/{path}", allow_head=True)
 async def stream_handler(request: web.Request):
