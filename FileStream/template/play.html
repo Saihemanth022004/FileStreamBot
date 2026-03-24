@@ -436,18 +436,9 @@
         // Derive download URL from current page URL
         const streamlink = window.location.href.replace('/watch/', '/dl/');
 
-        // Detect unsupported audio codecs
+        // Detect unsupported audio codecs reliably
         (function detectAudioSupport() {
             const videoEl = document.getElementById('player');
-            const fileName = '{{file_name}}'.toLowerCase();
-            const mimeType = '{{mime_type}}'.toLowerCase();
-
-            // Known problematic containers/extensions for browser audio
-            const problematicExts = ['.mkv', '.avi', '.wmv', '.flv', '.ts', '.m2ts'];
-            const isProblematicFile = problematicExts.some(ext => fileName.endsWith(ext)) ||
-                                     mimeType.includes('matroska') ||
-                                     mimeType.includes('x-msvideo') ||
-                                     mimeType.includes('x-ms-wmv');
 
             function showAudioWarning() {
                 document.getElementById('audioWarning').classList.add('show');
@@ -456,60 +447,45 @@
                 document.getElementById('btnNplayer').classList.add('highlight');
             }
 
-            // Method 1: Check if browser reports no audio tracks after metadata loads
-            videoEl.addEventListener('loadedmetadata', function() {
-                if (videoEl.audioTracks && videoEl.audioTracks.length === 0) {
-                    showAudioWarning();
-                }
-            });
+            let checkCount = 0;
+            let checkInterval;
 
-            // Method 2: If the video plays but has no audible audio,
-            // detect via the Web Audio API
-            let audioCheckDone = false;
             videoEl.addEventListener('playing', function() {
-                if (audioCheckDone) return;
-                audioCheckDone = true;
-
-                try {
-                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                    const src = ctx.createMediaElementSource(videoEl);
-                    const analyser = ctx.createAnalyser();
-                    analyser.fftSize = 256;
-                    src.connect(analyser);
-                    analyser.connect(ctx.destination);
-                    const data = new Uint8Array(analyser.frequencyBinCount);
-
-                    let silentChecks = 0;
-                    const checkInterval = setInterval(() => {
-                        analyser.getByteFrequencyData(data);
-                        const sum = data.reduce((a, b) => a + b, 0);
-                        if (sum === 0) silentChecks++;
-                        else silentChecks = 0;
-
-                        // If silent for ~2 seconds (4 checks at 500ms)
-                        if (silentChecks >= 4) {
+                if (checkCount > 0) return; // Only start interval once
+                
+                checkInterval = setInterval(() => {
+                    checkCount++;
+                    
+                    // Check via WebKit decoded byte counts (Chrome, Edge, Opera, Safari)
+                    if (typeof videoEl.webkitAudioDecodedByteCount !== 'undefined') {
+                        // If video is decoding, but audio is not decoding at all after a few seconds
+                        // it means the video codec is supported but audio is unsupported.
+                        if (videoEl.webkitVideoDecodedByteCount > 0 && videoEl.webkitAudioDecodedByteCount === 0) {
+                            showAudioWarning();
                             clearInterval(checkInterval);
+                        } else if (videoEl.webkitAudioDecodedByteCount > 0) {
+                            // Audio is successfully decoding
+                            clearInterval(checkInterval);
+                        }
+                    } 
+                    // Fallback for Safari's audioTracks API
+                    else if (videoEl.audioTracks) {
+                        if (videoEl.audioTracks.length === 0) {
                             showAudioWarning();
                         }
-                        // Stop checking after 5 seconds
-                        if (silentChecks < 0) clearInterval(checkInterval);
-                    }, 500);
+                        clearInterval(checkInterval);
+                    } else {
+                        // Firefox doesn't expose these metrics reliably yet, 
+                        // so we avoid false positives by not doing anything.
+                        clearInterval(checkInterval);
+                    }
 
-                    // Auto-stop after 5 seconds
-                    setTimeout(() => clearInterval(checkInterval), 5000);
-                } catch(e) {
-                    // Web Audio API not available, fall back to file-based detection
-                    if (isProblematicFile) showAudioWarning();
-                }
+                    // Stop checking after ~5 seconds to save resources
+                    if (checkCount > 10) {
+                        clearInterval(checkInterval);
+                    }
+                }, 500);
             });
-
-            // Method 3: Immediate file-based heuristic for known problem formats
-            if (isProblematicFile) {
-                // Show warning after a short delay to let the video try loading
-                setTimeout(() => {
-                    showAudioWarning();
-                }, 2000);
-            }
         })();
 
         function streamDownload() {
