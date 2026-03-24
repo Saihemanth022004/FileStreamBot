@@ -266,6 +266,89 @@
             50% { box-shadow: 0 0 16px 4px rgba(245, 158, 11, 0.15); }
         }
 
+        /* Modal for PC VLC */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: #fff;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            padding: 24px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .modal-header h3 {
+            font-size: 1.1rem;
+            color: #0f0f0f;
+            margin: 0;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        .modal-body p {
+            font-size: 0.9rem;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        .link-box {
+            display: flex;
+            margin-top: 16px;
+            gap: 8px;
+        }
+        .link-box input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #f9fafb;
+            color: #374151;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .link-box button {
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .link-box button:hover {
+            background: #cc0000;
+        }
+
         /* Toast notification */
         .toast {
             position: fixed;
@@ -389,6 +472,25 @@
         </div>
     </div>
 
+    <!-- PC VLC Modal -->
+    <div class="modal-overlay" id="vlcModal" onclick="closeVlcModal(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Open in VLC Player</h3>
+                <button class="close-btn" onclick="document.getElementById('vlcModal').classList.remove('show')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>1. Open VLC on your PC.</p>
+                <p>2. Press <strong>Ctrl + N</strong> (Open Network Stream).</p>
+                <p>3. Paste this link and click Play:</p>
+                <div class="link-box">
+                    <input type="text" id="vlcLinkInput" readonly>
+                    <button onclick="copyVlcLink()">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div class="toast" id="toast">Link copied to clipboard!</div>
 
@@ -492,12 +594,29 @@
 
         function vlc_player() {
             const isAndroid = /Android/i.test(navigator.userAgent);
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
             if (isAndroid) {
                 window.location.href = `intent:${streamlink}#Intent;package=org.videolan.vlc;type=video/*;end`;
-            } else {
+            } else if (isIOS) {
                 window.location.href = `vlc://${streamlink}`;
+            } else {
+                document.getElementById('vlcLinkInput').value = streamlink;
+                document.getElementById('vlcModal').classList.add('show');
             }
+        }
+
+        function closeVlcModal(e) {
+            if (e.target === document.getElementById('vlcModal')) {
+                document.getElementById('vlcModal').classList.remove('show');
+            }
+        }
+
+        function copyVlcLink() {
+            const input = document.getElementById('vlcLinkInput');
+            input.select();
+            document.execCommand('copy');
+            showToast('Stream link copied! Paste it in VLC.');
         }
 
         function mx_player() {
