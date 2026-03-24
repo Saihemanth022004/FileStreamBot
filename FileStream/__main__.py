@@ -41,6 +41,18 @@ async def start_services():
     FileStream.id = bot_info.id
     FileStream.username = bot_info.username
     FileStream.fname=bot_info.first_name
+    
+    from pyrogram.types import BotCommand
+    await FileStream.set_bot_commands([
+        BotCommand("start", "Start the bot"),
+        BotCommand("help", "Get help menu"),
+        BotCommand("about", "About the bot"),
+        BotCommand("create_playlist", "Create a new playlist"),
+        BotCommand("my_playlists", "View your playlists"),
+        BotCommand("get_playlist", "Get playlist link"),
+        BotCommand("files", "View your uploaded files")
+    ])
+    
     print("------------------------------ DONE ------------------------------")
     print()
     print("---------------------- Initializing Clients ----------------------")

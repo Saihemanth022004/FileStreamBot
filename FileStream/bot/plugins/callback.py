@@ -69,6 +69,40 @@ async def cb_data(bot, update: CallbackQuery):
             reply_markup=reply_markup,
         )
 
+    elif usr_cmd[0] == "grouppl":
+        playlist_id = usr_cmd[1]
+        playlist = await db.get_playlist(playlist_id)
+        if not playlist:
+            return await update.answer("Playlist not found", show_alert=True)
+            
+        playlist_link = f"{Server.URL}playlist/{playlist_id}"
+        await update.message.edit_text(
+            f"📺 **Batch Playlist:** {playlist['title']}\n🍿 **Total Videos:** {len(playlist['files'])}\n\n🔗 {playlist_link}",
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("📺 Watch Playlist", url=playlist_link)]]),
+            disable_web_page_preview=True
+        )
+
+    elif usr_cmd[0] == "groupind":
+        playlist_id = usr_cmd[1]
+        playlist = await db.get_playlist(playlist_id)
+        if not playlist:
+            return await update.answer("Playlist not found", show_alert=True)
+            
+        await update.message.edit_text("Generating individual links... Please wait.")
+        for file_id in playlist['files']:
+            try:
+                reply_markup, stream_text = await gen_link(_id=file_id)
+                await update.message.reply_text(
+                    text=stream_text,
+                    parse_mode=ParseMode.HTML,
+                    disable_web_page_preview=True,
+                    reply_markup=reply_markup,
+                    quote=True
+                )
+            except Exception:
+                pass
+        await update.message.delete()
+
     elif usr_cmd[0] == "userfiles":
         file_list, total_files = await gen_file_list_button(int(usr_cmd[1]), update.from_user.id)
         await update.message.edit_caption(
