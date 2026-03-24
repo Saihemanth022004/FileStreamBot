@@ -519,6 +519,25 @@
             tooltips: { controls: true, seek: true }   // Show helpful tooltips on hover
         });
 
+        // Mobile double-tap to seek functionality
+        let lastTap = 0;
+        document.querySelector('.video-container').addEventListener('touchend', function(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            
+            if (tapLength < 300 && tapLength > 0) {
+                const touchX = e.changedTouches[0].clientX;
+                const containerRect = this.getBoundingClientRect();
+                
+                if (touchX > containerRect.left + (containerRect.width / 2)) {
+                    player.forward(10); // Right side: Forward 10s
+                } else {
+                    player.rewind(10);  // Left side: Rewind 10s
+                }
+            }
+            lastTap = currentTime;
+        });
+
         // Derive download URL from current page URL
         const streamlink = window.location.href.replace('/watch/', '/dl/');
 
