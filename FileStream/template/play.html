@@ -397,9 +397,26 @@
     <!-- Scripts -->
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
-        // Initialize Plyr
+        // Initialize Plyr with all advanced features enabled
         const player = new Plyr('#player', {
-            controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'fullscreen'],
+            controls: [
+                'play-large',   // The large play button in the center
+                'restart',      // Restart playback from the beginning
+                'rewind',       // Rewind by 10 seconds
+                'play',         // Play/pause playback
+                'fast-forward', // Fast forward by 10 seconds
+                'progress',     // The progress bar and scrubber
+                'current-time', // The current time of playback
+                'duration',     // The full duration of the media
+                'mute',         // Toggle mute
+                'volume',       // Volume control
+                'settings',     // Settings menu (speed, quality)
+                'pip',          // Picture-in-picture mode
+                'fullscreen'    // Toggle fullscreen
+            ],
+            seekTime: 10,       // Fast forward/rewind time in seconds
+            keyboard: { focused: true, global: true }, // Enable keyboard shortcuts
+            tooltips: { controls: true, seek: true }   // Show helpful tooltips on hover
         });
 
         // Derive download URL from current page URL
