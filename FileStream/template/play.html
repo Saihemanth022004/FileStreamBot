@@ -507,7 +507,12 @@
         }
 
         function vlc_player() {
-            window.location.href = `vlc://${streamlink}`;
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            if (isAndroid) {
+                window.location.href = `intent:${streamlink}#Intent;package=org.videolan.vlc;type=video/*;end`;
+            } else {
+                window.location.href = `vlc://${streamlink}`;
+            }
         }
 
         function mx_player() {
