@@ -26,5 +26,6 @@ async def render_page(db_id):
     return template.render(
         file_name=file_name,
         file_url=src,
-        file_size=file_size
+        file_size=file_size,
+        mime_type=file_data.get('mime_type', 'video/mp4')
     )
