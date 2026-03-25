@@ -546,14 +546,15 @@
         // Robust cross-platform Double-Tap to Seek fix
         let lastTap = 0;
         document.querySelector('.video-container').addEventListener('click', function(e) {
-            // Ignore clicks directly on control buttons
             if (e.target.closest('.plyr__controls')) return;
 
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
             
             if (tapLength < 300 && tapLength > 0) {
-                // Determine left or right side click
+                e.preventDefault();
+                e.stopPropagation();
+                
                 const rect = this.getBoundingClientRect();
                 const tapX = e.clientX || (e.changedTouches ? e.changedTouches[0].clientX : 0);
                 
@@ -567,6 +568,12 @@
             }
             lastTap = currentTime;
         });
+
+        // Prevent Plyr's default double-click-to-fullscreen behavior
+        document.querySelector('.video-container').addEventListener('dblclick', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }, true);
 
         // Derive download URL from current page URL
         const streamlink = window.location.href.replace('/watch/', '/dl/');
