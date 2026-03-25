@@ -543,37 +543,36 @@
             tooltips: { controls: true, seek: true }
         });
 
-        // Robust cross-platform Double-Tap to Seek fix
-        let lastTap = 0;
-        document.querySelector('.video-container').addEventListener('click', function(e) {
-            if (e.target.closest('.plyr__controls')) return;
-
-            const currentTime = new Date().getTime();
-            const tapLength = currentTime - lastTap;
-            
-            if (tapLength < 300 && tapLength > 0) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const rect = this.getBoundingClientRect();
-                const tapX = e.clientX || (e.changedTouches ? e.changedTouches[0].clientX : 0);
-                
-                if (tapX > rect.left + (rect.width / 2)) {
-                    player.forward(10);
-                    showToast('⏩ 10s');
-                } else {
-                    player.rewind(10);
-                    showToast('⏪ 10s');
-                }
+        // Force Plyr to disable its native double-click fullscreen
+        player.on('ready', () => {
+            const wrapper = document.querySelector('.plyr__video-wrapper');
+            if(wrapper) {
+                let lastTap = 0;
+                wrapper.addEventListener('touchstart', function(e) {
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - lastTap;
+                    
+                    if (tapLength < 300 && tapLength > 0) {
+                        // This prevents the browser from generating a 'click' or 'dblclick'
+                        // and strictly stops Plyr from forcing Fullscreen.
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        const rect = this.getBoundingClientRect();
+                        const tapX = e.touches[0].clientX;
+                        
+                        if (tapX > rect.left + (rect.width / 2)) {
+                            player.forward(10);
+                            showToast('⏩ 10s');
+                        } else {
+                            player.rewind(10);
+                            showToast('⏪ 10s');
+                        }
+                    }
+                    lastTap = currentTime;
+                }, { passive: false });
             }
-            lastTap = currentTime;
         });
-
-        // Prevent Plyr's default double-click-to-fullscreen behavior
-        document.querySelector('.video-container').addEventListener('dblclick', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }, true);
 
         // Derive download URL from current page URL
         const streamlink = window.location.href.replace('/watch/', '/dl/');
