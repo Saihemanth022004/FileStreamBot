@@ -7,15 +7,26 @@ from FileStream.utils.bot_utils import gen_linkx, verify_user
 from FileStream.config import Telegram
 from FileStream.utils.database import Database
 from FileStream.utils.translation import LANG, BUTTON
-from pyrogram import filters, Client
+from pyrogram import filters, Client, enums
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 from pyrogram.enums.parse_mode import ParseMode
 import asyncio
+import time
 
 db = Database(Telegram.DATABASE_URL, Telegram.SESSION_NAME)
 
+@FileStream.on_message(filters.command('ping'))
+async def ping(bot: Client, message: Message):
+    await bot.send_chat_action(message.chat.id, enums.ChatAction.TYPING)
+    start_time = time.time()
+    msg = await message.reply_text("<i>⏳ Pɪɴɢɪɴɢ...</i>", quote=True, parse_mode=ParseMode.HTML)
+    end_time = time.time()
+    ping_time = round((end_time - start_time) * 1000, 3)
+    await msg.edit_text(f"<b>🏓 PONG!</b>\n<b>Lᴀᴛᴇɴᴄʏ:</b> <code>{ping_time} ms</code>", parse_mode=ParseMode.HTML)
+
 @FileStream.on_message(filters.command('start') & filters.private)
 async def start(bot: Client, message: Message):
+    await bot.send_chat_action(message.chat.id, enums.ChatAction.TYPING)
     if not await verify_user(bot, message):
         return
     usr_cmd = message.text.split("_")[-1]
@@ -82,7 +93,8 @@ async def start(bot: Client, message: Message):
             await message.reply_text(f"**Invalid Command**")
 
 @FileStream.on_message(filters.private & filters.command(["about"]))
-async def start(bot, message):
+async def about(bot, message):
+    await bot.send_chat_action(message.chat.id, enums.ChatAction.TYPING)
     if not await verify_user(bot, message):
         return
     if Telegram.START_PIC:

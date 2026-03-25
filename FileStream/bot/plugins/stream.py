@@ -5,7 +5,7 @@ from FileStream.utils.bot_utils import is_user_banned, is_user_exist, is_user_jo
 from FileStream.utils.database import Database
 from FileStream.utils.file_properties import get_file_ids, get_file_info
 from FileStream.config import Telegram
-from pyrogram import filters, Client
+from pyrogram import filters, Client, enums
 from pyrogram.errors import FloodWait
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums.parse_mode import ParseMode
@@ -25,6 +25,7 @@ db = Database(Telegram.DATABASE_URL, Telegram.SESSION_NAME)
     group=4,
 )
 async def private_receive_handler(bot: Client, message: Message):
+    await bot.send_chat_action(message.chat.id, enums.ChatAction.TYPING)
     if not await is_user_authorized(message):
         return
     if await is_user_banned(message):
@@ -36,15 +37,15 @@ async def private_receive_handler(bot: Client, message: Message):
             return
 
     try:
+        msg = await message.reply_text("<i>⏳ Pʀᴏᴄᴇssɪɴɢ ʏᴏᴜʀ ғɪʟᴇ...</i>", quote=True, parse_mode=ParseMode.HTML)
         inserted_id = await db.add_file(get_file_info(message))
         await get_file_ids(False, inserted_id, multi_clients, message)
         reply_markup, stream_text = await gen_link(_id=inserted_id)
-        await message.reply_text(
+        await msg.edit_text(
             text=stream_text,
             parse_mode=ParseMode.HTML,
             disable_web_page_preview=True,
-            reply_markup=reply_markup,
-            quote=True
+            reply_markup=reply_markup
         )
     except FloodWait as e:
         print(f"Sleeping for {str(e.value)}s")

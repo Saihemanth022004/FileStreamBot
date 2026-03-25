@@ -47,6 +47,7 @@ async def start_services():
         BotCommand("start", "Start the bot"),
         BotCommand("help", "Get help menu"),
         BotCommand("about", "About the bot"),
+        BotCommand("ping", "Check bot latency"),
         BotCommand("files", "View your uploaded files")
     ])
     
