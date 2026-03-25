@@ -571,7 +571,17 @@
         });
 
         // Force Plyr to disable its native double-click fullscreen
+        // Playback Resume Feature (LocalStorage)
         player.on('ready', () => {
+            const videoId = window.location.pathname.split('/').pop();
+            const savedTime = localStorage.getItem('plyr_resume_' + videoId);
+            if (savedTime) {
+                player.currentTime = parseFloat(savedTime);
+                if(parseFloat(savedTime) > 0) {
+                    showToast('Resuming where you left off...');
+                }
+            }
+
             const wrapper = document.querySelector('.plyr__video-wrapper');
             if(wrapper) {
                 
@@ -601,8 +611,6 @@
                     const tapLength = currentTime - lastTap;
                     
                     if (tapLength < 300 && tapLength > 0) {
-                        // This prevents the browser from generating a 'click' or 'dblclick'
-                        // and strictly stops Plyr from forcing Fullscreen.
                         e.preventDefault();
                         e.stopPropagation();
                         
@@ -619,6 +627,13 @@
                     }
                     lastTap = currentTime;
                 }, { passive: false });
+            }
+        });
+
+        player.on('timeupdate', () => {
+            const videoId = window.location.pathname.split('/').pop();
+            if (player.currentTime > 5) {
+                localStorage.setItem('plyr_resume_' + videoId, player.currentTime);
             }
         });
 
