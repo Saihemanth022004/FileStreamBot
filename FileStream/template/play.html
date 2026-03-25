@@ -156,6 +156,33 @@
             background: rgba(255, 255, 255, 0.3) !important;
         }
 
+        /* YouTube-style Skip Indicators */
+        .skip-indicator {
+            position: absolute;
+            top: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-50%) scale(0.9);
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            z-index: 50;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .skip-indicator.show {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.1);
+        }
+        .skip-left { left: 15%; }
+        .skip-right { right: 15%; }
+
         /* File Info */
         .file-info {
             padding: 24px 28px;
@@ -547,6 +574,27 @@
         player.on('ready', () => {
             const wrapper = document.querySelector('.plyr__video-wrapper');
             if(wrapper) {
+                
+                // Native Overlay Skip Function
+                function showSkipIndicator(direction) {
+                    let indicator = wrapper.querySelector('.skip-indicator.' + direction);
+                    if (!indicator) {
+                        indicator = document.createElement('div');
+                        indicator.className = `skip-indicator ${direction === 'forward' ? 'skip-right' : 'skip-left'}`;
+                        indicator.innerHTML = direction === 'forward' ? '⏩ 10s' : '⏪ 10s';
+                        wrapper.appendChild(indicator);
+                    }
+                    
+                    indicator.classList.remove('show');
+                    void indicator.offsetWidth; // trigger reflow for animation reset
+                    indicator.classList.add('show');
+                    
+                    if (indicator.hideTimeout) clearTimeout(indicator.hideTimeout);
+                    indicator.hideTimeout = setTimeout(() => {
+                        indicator.classList.remove('show');
+                    }, 500);
+                }
+
                 let lastTap = 0;
                 wrapper.addEventListener('touchstart', function(e) {
                     const currentTime = new Date().getTime();
@@ -563,10 +611,10 @@
                         
                         if (tapX > rect.left + (rect.width / 2)) {
                             player.forward(10);
-                            showToast('⏩ 10s');
+                            showSkipIndicator('forward');
                         } else {
                             player.rewind(10);
-                            showToast('⏪ 10s');
+                            showSkipIndicator('rewind');
                         }
                     }
                     lastTap = currentTime;
