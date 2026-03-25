@@ -18,6 +18,9 @@
     <link rel="icon" href="/logo.png" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.plyr.io" crossorigin>
+    <link rel="preload" href="https://cdn.plyr.io/3.7.8/plyr.css" as="style">
+    <link rel="preload" href="https://cdn.plyr.io/3.7.8/plyr.js" as="script">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <style>
@@ -470,7 +473,7 @@
         <div class="video-card">
             <!-- Video Player -->
             <div class="video-container">
-                <video id="player" playsinline controls>
+                <video id="player" playsinline controls preload="auto" data-poster="{{poster_url}}">
                     <source src="{{file_url}}" type="{{mime_type}}">
                     Your browser does not support this video format.
                 </video>
