@@ -10,10 +10,33 @@ from FileStream.config import Telegram, Server
 from FileStream.server.exceptions import FIleNotFound, InvalidHash
 from FileStream import utils, StartTime, __version__
 from FileStream.utils.render_template import render_page
+from FileStream.utils.database import Database
 
 import os
 
+db = Database(Telegram.DATABASE_URL, Telegram.SESSION_NAME)
 routes = web.RouteTableDef()
+
+@routes.get("/thumb/{path}", allow_head=True)
+async def thumb_handler(request: web.Request):
+    try:
+        path = request.match_info["path"]
+        file_data = await db.get_file(path)
+        thumb_id = file_data.get("thumb_file_id")
+        if not thumb_id:
+            logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "template", "logo.png")
+            return web.FileResponse(logo_path)
+        
+        client = multi_clients[0]
+        file_bytes = await client.download_media(thumb_id, in_memory=True)
+        return web.Response(body=file_bytes.getvalue(), content_type='image/jpeg')
+    except InvalidHash as e:
+        raise web.HTTPForbidden(text=e.message)
+    except FIleNotFound as e:
+        raise web.HTTPNotFound(text=e.message)
+    except Exception as e:
+        logging.error(e)
+        raise web.HTTPInternalServerError(text=str(e))
 
 @routes.get("/logo.png", allow_head=True)
 async def logo_handler(_):

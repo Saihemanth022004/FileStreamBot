@@ -8,6 +8,7 @@ import datetime
 
 from FileStream.utils.broadcast_helper import send_msg
 from FileStream.utils.database import Database
+from FileStream.utils.human_readable import humanbytes
 from FileStream.bot import FileStream
 from FileStream.server.exceptions import FIleNotFound
 from FileStream.config import Telegram, Server
@@ -21,10 +22,18 @@ broadcast_ids = {}
 
 @FileStream.on_message(filters.command("status") & filters.private & filters.user(Telegram.OWNER_ID))
 async def sts(c: Client, m: Message):
-    await m.reply_text(text=f"""**Total Users in DB:** `{await db.total_users_count()}`
-**Banned Users in DB:** `{await db.total_banned_users_count()}`
-**Total Links Generated: ** `{await db.total_files()}`"""
-                       , parse_mode=ParseMode.MARKDOWN, quote=True)
+    total_users = await db.total_users_count()
+    banned_users = await db.total_banned_users_count()
+    total_files = await db.total_files()
+    total_storage = humanbytes(await db.total_storage())
+    
+    text = f"""**📊 Bᴏᴛ Aɴᴀʟʏᴛɪᴄs Dᴀsʜʙᴏᴀʀᴅ**
+
+**👥 Tᴏᴛᴀʟ Usᴇʀs :** `{total_users}`
+**🚫 Bᴀɴɴᴇᴅ Usᴇʀs :** `{banned_users}`
+**📂 Tᴏᴛᴀʟ Fɪʟᴇs :** `{total_files}`
+**💾 Sᴛᴏʀᴀɢᴇ Pʀᴏᴄᴇssᴇᴅ :** `{total_storage}`"""
+    await m.reply_text(text=text, parse_mode=ParseMode.MARKDOWN, quote=True)
 
 
 @FileStream.on_message(filters.command("ban") & filters.private & filters.user(Telegram.OWNER_ID))

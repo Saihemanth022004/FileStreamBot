@@ -105,13 +105,19 @@ def get_file_info(message):
         user_idx = message.from_user.id
     else:
         user_idx = message.chat.id
+        
+    thumb_file_id = ""
+    if getattr(media, "thumbs", None):
+        thumb_file_id = media.thumbs[0].file_id
+
     return {
         "user_id": user_idx,
         "file_id": getattr(media, "file_id", ""),
         "file_unique_id": getattr(media, "file_unique_id", ""),
         "file_name": get_name(message),
         "file_size": getattr(media, "file_size", 0),
-        "mime_type": getattr(media, "mime_type", "None/unknown")
+        "mime_type": getattr(media, "mime_type", "None/unknown"),
+        "thumb_file_id": thumb_file_id
     }
 
 

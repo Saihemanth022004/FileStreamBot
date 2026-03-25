@@ -38,6 +38,15 @@ async def cb_data(bot, update: CallbackQuery):
 
     #---------------------[ MY FILES CMD ]---------------------#
 
+    elif usr_cmd[0] == "expire":
+        _id = usr_cmd[1]
+        try:
+            await db.set_expiry(_id)
+            await update.answer("⏳ This link is now marked as Temporary. It will self-destruct 24 hours after creation!", show_alert=True)
+        except FIleNotFound:
+            await update.answer("File already deleted.", show_alert=True)
+        return
+
     elif usr_cmd[0] == "N/A":
         await update.answer("N/A", True)
     elif usr_cmd[0] == "close":
