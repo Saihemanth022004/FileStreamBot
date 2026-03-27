@@ -41,27 +41,15 @@ async def is_user_joined(bot, message: Message):
             return False
     except UserNotParticipant:
         invite_link = await get_invite_link(bot, chat_id=channel_chat_id)
-        if Telegram.VERIFY_PIC:
-            ver = await message.reply_photo(
-                photo=Telegram.VERIFY_PIC,
-                caption="<i>Jᴏɪɴ ᴍʏ ᴜᴘᴅᴀᴛᴇ ᴄʜᴀɴɴᴇʟ ᴛᴏ ᴜsᴇ ᴍᴇ 🔐</i>",
-                parse_mode=ParseMode.HTML,
-                reply_markup=InlineKeyboardMarkup(
+        ver = await message.reply_text(
+            text = "<i>Jᴏɪɴ ᴍʏ ᴜᴘᴅᴀᴛᴇ ᴄʜᴀɴɴᴇʟ ᴛᴏ ᴜsᴇ ᴍᴇ 🔐</i>",
+            reply_markup=InlineKeyboardMarkup(
                 [[
                     InlineKeyboardButton("❆ Jᴏɪɴ Oᴜʀ Cʜᴀɴɴᴇʟ ❆", url=invite_link.invite_link)
                 ]]
-                )
-            )
-        else:
-            ver = await message.reply_text(
-                text = "<i>Jᴏɪɴ ᴍʏ ᴜᴘᴅᴀᴛᴇ ᴄʜᴀɴɴᴇʟ ᴛᴏ ᴜsᴇ ᴍᴇ 🔐</i>",
-                reply_markup=InlineKeyboardMarkup(
-                    [[
-                        InlineKeyboardButton("❆ Jᴏɪɴ Oᴜʀ Cʜᴀɴɴᴇʟ ❆", url=invite_link.invite_link)
-                    ]]
-                ),
-                parse_mode=ParseMode.HTML
-            )
+            ),
+            parse_mode=ParseMode.HTML
+        )
         await asyncio.sleep(30)
         try:
             await ver.delete()
