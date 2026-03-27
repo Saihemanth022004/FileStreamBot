@@ -35,7 +35,7 @@ async def is_user_joined(bot, message: Message):
         if user.status == "BANNED":
             await message.reply_text(
                 text=LANG.BAN_TEXT.format(Telegram.OWNER_ID),
-                parse_mode=ParseMode.MARKDOWN,
+                parse_mode=ParseMode.HTML,
                 disable_web_page_preview=True
             )
             return False
@@ -59,7 +59,7 @@ async def is_user_joined(bot, message: Message):
         return False
     except Exception:
         await message.reply_text(
-            text = f"<i>Sᴏᴍᴇᴛʜɪɴɢ ᴡʀᴏɴɢ ᴄᴏɴᴛᴀᴄᴛ ᴍʏ ᴅᴇᴠᴇʟᴏᴘᴇʀ</i> <b><a href='https://t.me/{Telegram.UPDATES_CHANNEL}'>[ ᴄʟɪᴄᴋ ʜᴇʀᴇ ]</a></b>",
+            text=LANG.FORCE_SUB_ERROR_TEXT,
             parse_mode=ParseMode.HTML,
             disable_web_page_preview=True)
         return False
@@ -75,24 +75,25 @@ async def gen_link(_id):
 
     page_link = f"{Server.URL}watch/{_id}"
     stream_link = f"{Server.URL}dl/{_id}"
+    download_link = f"{stream_link}?download=1"
     file_link = f"https://t.me/{FileStream.username}?start=file_{_id}"
 
     if "video" in mime_type:
-        stream_text = LANG.STREAM_TEXT.format(file_name, file_size, stream_link, page_link, file_link)
+        stream_text = LANG.STREAM_TEXT.format(file_name, file_size, download_link, page_link, file_link)
         reply_markup = InlineKeyboardMarkup(
             [
-                [InlineKeyboardButton("sᴛʀᴇᴀᴍ", url=page_link), InlineKeyboardButton("ᴅᴏᴡɴʟᴏᴀᴅ", url=stream_link)],
-                [InlineKeyboardButton("ɢᴇᴛ ғɪʟᴇ", url=file_link), InlineKeyboardButton("ʀᴇᴠᴏᴋᴇ ғɪʟᴇ", callback_data=f"msgdelpvt_{_id}")],
-                [InlineKeyboardButton("⌛ Sᴇᴛ 24ʜ Exᴘɪʀʏ", callback_data=f"expire_{_id}"), InlineKeyboardButton("ᴄʟᴏsᴇ", callback_data="close")]
+                [InlineKeyboardButton("sᴛʀᴇᴀᴍ", url=page_link), InlineKeyboardButton("ᴅᴏᴡɴʟᴏᴀᴅ", url=download_link)],
+                [InlineKeyboardButton("Get File", url=file_link), InlineKeyboardButton("Delete Link", callback_data=f"msgdelpvt_{_id}")],
+                [InlineKeyboardButton("24h Expiry", callback_data=f"expire_{_id}"), InlineKeyboardButton("Close", callback_data="close")]
             ]
         )
     else:
-        stream_text = LANG.STREAM_TEXT_X.format(file_name, file_size, stream_link, file_link)
+        stream_text = LANG.STREAM_TEXT_X.format(file_name, file_size, download_link, file_link)
         reply_markup = InlineKeyboardMarkup(
             [
-                [InlineKeyboardButton("ᴅᴏᴡɴʟᴏᴀᴅ", url=stream_link)],
-                [InlineKeyboardButton("ɢᴇᴛ ғɪʟᴇ", url=file_link), InlineKeyboardButton("ʀᴇᴠᴏᴋᴇ ғɪʟᴇ", callback_data=f"msgdelpvt_{_id}")],
-                [InlineKeyboardButton("⌛ Sᴇᴛ 24ʜ Exᴘɪʀʏ", callback_data=f"expire_{_id}"), InlineKeyboardButton("ᴄʟᴏsᴇ", callback_data="close")]
+                [InlineKeyboardButton("Download", url=download_link)],
+                [InlineKeyboardButton("Get File", url=file_link), InlineKeyboardButton("Delete Link", callback_data=f"msgdelpvt_{_id}")],
+                [InlineKeyboardButton("24h Expiry", callback_data=f"expire_{_id}"), InlineKeyboardButton("Close", callback_data="close")]
             ]
         )
     return reply_markup, stream_text
@@ -107,20 +108,21 @@ async def gen_linkx(m: Message, _id, name: list | None = None):
 
     page_link = f"{Server.URL}watch/{_id}"
     stream_link = f"{Server.URL}dl/{_id}"
+    download_link = f"{stream_link}?download=1"
     file_link = f"https://t.me/{FileStream.username}?start=file_{_id}"
 
     if "video" in mime_type:
-        stream_text = LANG.STREAM_TEXT.format(file_name, file_size, stream_link, page_link, file_link)
+        stream_text = LANG.STREAM_TEXT.format(file_name, file_size, download_link, page_link, file_link)
         reply_markup = InlineKeyboardMarkup(
             [
-                [InlineKeyboardButton("sᴛʀᴇᴀᴍ", url=page_link), InlineKeyboardButton("ᴅᴏᴡɴʟᴏᴀᴅ", url=stream_link)]
+                [InlineKeyboardButton("Stream", url=page_link), InlineKeyboardButton("Download", url=download_link)]
             ]
         )
     else:
-        stream_text = LANG.STREAM_TEXT_X.format(file_name, file_size, stream_link, file_link)
+        stream_text = LANG.STREAM_TEXT_X.format(file_name, file_size, download_link, file_link)
         reply_markup = InlineKeyboardMarkup(
             [
-                [InlineKeyboardButton("ᴅᴏᴡɴʟᴏᴀᴅ", url=stream_link)]
+                [InlineKeyboardButton("Download", url=download_link)]
             ]
         )
     return reply_markup, stream_text
@@ -131,7 +133,7 @@ async def is_user_banned(message):
     if await db.is_user_banned(message.from_user.id):
         await message.reply_text(
             text=LANG.BAN_TEXT.format(Telegram.OWNER_ID),
-            parse_mode=ParseMode.MARKDOWN,
+            parse_mode=ParseMode.HTML,
             disable_web_page_preview=True
         )
         return True
@@ -145,7 +147,7 @@ async def is_channel_banned(bot, message):
             chat_id=message.chat.id,
             message_id=message.id,
             reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton(f"ᴄʜᴀɴɴᴇʟ ɪs ʙᴀɴɴᴇᴅ", callback_data="N/A")]])
+                InlineKeyboardButton("Channel Banned", callback_data="N/A")]])
         )
         return True
     return False
@@ -161,8 +163,8 @@ async def is_user_authorized(message):
 
         if not (user_id in Telegram.AUTH_USERS):
             await message.reply_text(
-                text="Yᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴀᴜᴛʜᴏʀɪᴢᴇᴅ ᴛᴏ ᴜsᴇ ᴛʜɪs ʙᴏᴛ.",
-                parse_mode=ParseMode.MARKDOWN,
+                text=LANG.AUTH_DENIED_TEXT,
+                parse_mode=ParseMode.HTML,
                 disable_web_page_preview=True
             )
             return False

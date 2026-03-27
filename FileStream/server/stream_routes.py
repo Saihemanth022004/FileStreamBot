@@ -96,6 +96,7 @@ class_cache = {}
 
 async def media_streamer(request: web.Request, db_id: str):
     range_header = request.headers.get("Range")
+    force_download = request.query.get("download") == "1"
     
     index = min(work_loads, key=work_loads.get)
     faster_client = multi_clients[index]
@@ -151,7 +152,7 @@ async def media_streamer(request: web.Request, db_id: str):
     if not mime_type:
         mime_type = mimetypes.guess_type(file_name)[0] or "application/octet-stream"
 
-    if "video/" in mime_type or "audio/" in mime_type:
+    if not force_download and ("video/" in mime_type or "audio/" in mime_type):
         disposition = "inline"
 
     return web.Response(

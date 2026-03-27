@@ -147,10 +147,11 @@ async def gen_file_menu(_id, file_list_no, update: CallbackQuery):
 
     page_link = f"{Server.URL}watch/{myfile_info['_id']}"
     stream_link = f"{Server.URL}dl/{myfile_info['_id']}"
+    download_link = f"{stream_link}?download=1"
     if "video" in file_type.lower():
         MYFILES_BUTTONS = InlineKeyboardMarkup(
             [
-                [InlineKeyboardButton("sᴛʀᴇᴀᴍ", url=page_link), InlineKeyboardButton("ᴅᴏᴡɴʟᴏᴀᴅ", url=stream_link)],
+                [InlineKeyboardButton("Stream", url=page_link), InlineKeyboardButton("Download", url=download_link)],
                 [InlineKeyboardButton("Get File", callback_data=f"sendfile_{myfile_info['_id']}"),
                  InlineKeyboardButton("Delete Link", callback_data=f"msgdelete_{myfile_info['_id']}_{file_list_no}")],
                 [InlineKeyboardButton("Back", callback_data="userfiles_{}".format(file_list_no))]
@@ -159,7 +160,7 @@ async def gen_file_menu(_id, file_list_no, update: CallbackQuery):
     else:
         MYFILES_BUTTONS = InlineKeyboardMarkup(
             [
-                [InlineKeyboardButton("Download", url=stream_link)],
+                [InlineKeyboardButton("Download", url=download_link)],
                 [InlineKeyboardButton("Get File", callback_data=f"sendfile_{myfile_info['_id']}"),
                  InlineKeyboardButton("Delete Link", callback_data=f"msgdelete_{myfile_info['_id']}_{file_list_no}")],
                 [InlineKeyboardButton("Back", callback_data="userfiles_{}".format(file_list_no))]

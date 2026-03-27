@@ -680,6 +680,7 @@
 
         // Derive download URL from current page URL
         const streamlink = window.location.href.replace('/watch/', '/dl/');
+        const downloadLink = `${streamlink}${streamlink.includes('?') ? '&' : '?'}download=1`;
 
         // Detect unsupported audio codecs reliably
         (function detectAudioSupport() {
@@ -734,7 +735,7 @@
         })();
 
         function streamDownload() {
-            window.location.href = streamlink;
+            window.location.href = downloadLink;
         }
 
         function copyStreamLink() {
