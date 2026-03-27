@@ -42,10 +42,10 @@ async def is_user_joined(bot, message: Message):
     except UserNotParticipant:
         invite_link = await get_invite_link(bot, chat_id=channel_chat_id)
         ver = await message.reply_text(
-            text = "<i>Jᴏɪɴ ᴍʏ ᴜᴘᴅᴀᴛᴇ ᴄʜᴀɴɴᴇʟ ᴛᴏ ᴜsᴇ ᴍᴇ 🔐</i>",
+            text=LANG.FORCE_SUB_TEXT,
             reply_markup=InlineKeyboardMarkup(
                 [[
-                    InlineKeyboardButton("❆ Jᴏɪɴ Oᴜʀ Cʜᴀɴɴᴇʟ ❆", url=invite_link.invite_link)
+                    InlineKeyboardButton("Join Channel", url=invite_link.invite_link)
                 ]]
             ),
             parse_mode=ParseMode.HTML

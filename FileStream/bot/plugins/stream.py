@@ -5,6 +5,7 @@ from FileStream.utils.bot_utils import is_user_banned, is_user_exist, is_user_jo
 from FileStream.utils.database import Database
 from FileStream.utils.file_properties import get_file_ids, get_file_info
 from FileStream.config import Telegram
+from FileStream.utils.translation import LANG
 from pyrogram import filters, Client, enums
 from pyrogram.errors import FloodWait
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
@@ -37,7 +38,7 @@ async def private_receive_handler(bot: Client, message: Message):
             return
 
     try:
-        msg = await message.reply_text("<i>⏳ Pʀᴏᴄᴇssɪɴɢ ʏᴏᴜʀ ғɪʟᴇ...</i>", quote=True, parse_mode=ParseMode.HTML)
+        msg = await message.reply_text(LANG.PROCESSING_TEXT, quote=True, parse_mode=ParseMode.HTML)
         inserted_id = await db.add_file(get_file_info(message))
         await get_file_ids(False, inserted_id, multi_clients, message)
         reply_markup, stream_text = await gen_link(_id=inserted_id)
@@ -81,7 +82,7 @@ async def channel_receive_handler(bot: Client, message: Message):
             chat_id=message.chat.id,
             message_id=message.id,
             reply_markup=InlineKeyboardMarkup(
-                [[InlineKeyboardButton("Dᴏᴡɴʟᴏᴀᴅ ʟɪɴᴋ 📥",
+                [[InlineKeyboardButton("Get Link",
                                        url=f"https://t.me/{FileStream.username}?start=stream_{str(inserted_id)}")]])
         )
 

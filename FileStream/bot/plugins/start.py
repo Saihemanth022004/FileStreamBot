@@ -19,10 +19,10 @@ db = Database(Telegram.DATABASE_URL, Telegram.SESSION_NAME)
 async def ping(bot: Client, message: Message):
     await bot.send_chat_action(message.chat.id, enums.ChatAction.TYPING)
     start_time = time.time()
-    msg = await message.reply_text("<i>⏳ Pɪɴɢɪɴɢ...</i>", quote=True, parse_mode=ParseMode.HTML)
+    msg = await message.reply_text(LANG.PING_TEXT, quote=True, parse_mode=ParseMode.HTML)
     end_time = time.time()
     ping_time = round((end_time - start_time) * 1000, 3)
-    await msg.edit_text(f"<b>🏓 PONG!</b>\n<b>Lᴀᴛᴇɴᴄʏ:</b> <code>{ping_time} ms</code>", parse_mode=ParseMode.HTML)
+    await msg.edit_text(LANG.PONG_TEXT.format(ping_time), parse_mode=ParseMode.HTML)
 
 @FileStream.on_message(filters.command('start') & filters.private)
 async def start(bot: Client, message: Message):
@@ -55,9 +55,9 @@ async def start(bot: Client, message: Message):
                     )
 
             except FIleNotFound as e:
-                await message.reply_text("File Not Found")
+                await message.reply_text(LANG.FILE_NOT_FOUND_TEXT, parse_mode=ParseMode.HTML)
             except Exception as e:
-                await message.reply_text("Something Went Wrong")
+                await message.reply_text(LANG.SOMETHING_WENT_WRONG, parse_mode=ParseMode.HTML)
                 logging.error(e)
 
         elif "file_" in message.text:
@@ -76,13 +76,13 @@ async def start(bot: Client, message: Message):
                         pass
 
             except FIleNotFound as e:
-                await message.reply_text("**File Not Found**")
+                await message.reply_text(LANG.FILE_NOT_FOUND_TEXT, parse_mode=ParseMode.HTML)
             except Exception as e:
-                await message.reply_text("Something Went Wrong")
+                await message.reply_text(LANG.SOMETHING_WENT_WRONG, parse_mode=ParseMode.HTML)
                 logging.error(e)
 
         else:
-            await message.reply_text(f"**Invalid Command**")
+            await message.reply_text(LANG.INVALID_COMMAND_TEXT, parse_mode=ParseMode.HTML)
 
 @FileStream.on_message(filters.private & filters.command(["about"]))
 async def about(bot, message):
@@ -127,11 +127,12 @@ async def my_files(bot: Client, message: Message):
         )
     if not file_list:
         file_list.append(
-            [InlineKeyboardButton("ᴇᴍᴘᴛʏ", callback_data="N/A")],
+            [InlineKeyboardButton("Empty", callback_data="N/A")],
         )
-    file_list.append([InlineKeyboardButton("ᴄʟᴏsᴇ", callback_data="close")])
+    file_list.append([InlineKeyboardButton("Close", callback_data="close")])
     await message.reply_text(
-        text="Total files: {}".format(total_files),
+        text=LANG.FILES_TEXT.format(total_files),
+        parse_mode=ParseMode.HTML,
         reply_markup=InlineKeyboardMarkup(file_list)
     )
 
