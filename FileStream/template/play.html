@@ -573,6 +573,44 @@
             tooltips: { controls: true, seek: true }
         });
 
+        const fullscreenElement = document.querySelector('.video-card');
+
+        async function lockLandscapeOrientation() {
+            if (screen.orientation && screen.orientation.lock) {
+                try {
+                    await screen.orientation.lock('landscape');
+                } catch (_) {
+                    // Some browsers require user activation or don't allow orientation lock.
+                }
+            }
+        }
+
+        async function unlockOrientation() {
+            if (screen.orientation && screen.orientation.unlock) {
+                try {
+                    screen.orientation.unlock();
+                } catch (_) {
+                    // Ignore browsers that do not support explicit unlock.
+                }
+            }
+        }
+
+        player.on('enterfullscreen', () => {
+            lockLandscapeOrientation();
+        });
+
+        player.on('exitfullscreen', () => {
+            unlockOrientation();
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement === fullscreenElement) {
+                lockLandscapeOrientation();
+            } else if (!document.fullscreenElement) {
+                unlockOrientation();
+            }
+        });
+
         // Force Plyr to disable its native double-click fullscreen
         // Playback Resume Feature (LocalStorage)
         player.on('ready', () => {

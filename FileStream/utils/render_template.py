@@ -1,4 +1,4 @@
-import aiohttp
+from pathlib import Path
 import jinja2
 import urllib.parse
 from FileStream.config import Telegram, Server
@@ -13,14 +13,11 @@ async def render_page(db_id):
     file_name = file_data['file_name'].replace("_", " ")
 
     if str((file_data['mime_type']).split('/')[0].strip()) == 'video':
-        template_file = "FileStream/template/play.html"
+        template_file = Path(__file__).resolve().parents[1] / "template" / "play.html"
     else:
-        template_file = "FileStream/template/dl.html"
-        async with aiohttp.ClientSession() as s:
-            async with s.get(src) as u:
-                file_size = humanbytes(int(u.headers.get('Content-Length')))
+        template_file = Path(__file__).resolve().parents[1] / "template" / "dl.html"
 
-    with open(template_file) as f:
+    with open(template_file, encoding="utf-8") as f:
         template = jinja2.Template(f.read())
 
     page_link = urllib.parse.urljoin(Server.URL, f'watch/{file_data["_id"]}')

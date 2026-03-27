@@ -77,10 +77,12 @@ class Database:
 
 # ---------------------[ FIND FILE IN DB ]---------------------#
     async def find_files(self, user_id, range):
-        user_files=self.file.find({"user_id": user_id})
-        user_files.skip(range[0] - 1)
-        user_files.limit(range[1] - range[0] + 1)
-        user_files.sort('_id', pymongo.DESCENDING)
+        user_files = (
+            self.file.find({"user_id": user_id})
+            .sort('_id', pymongo.DESCENDING)
+            .skip(range[0] - 1)
+            .limit(range[1] - range[0] + 1)
+        )
         total_files = await self.file.count_documents({"user_id": user_id})
         return user_files, total_files
 
@@ -147,5 +149,9 @@ class Database:
         if operation == "-":
             await self.col.update_one({"id": id}, {"$inc": {"Links": -1}})
         elif operation == "+":
-            await self.col.update_one({"id": id}, {"$inc": {"Links": 1}})
-
+            await self.col.update_one(
+                {"id": id},
+                {"$inc": {"Links": 1}, "$setOnInsert": self.new_user(id)},
+                upsert=True
+            )
+

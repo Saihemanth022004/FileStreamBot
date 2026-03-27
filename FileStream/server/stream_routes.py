@@ -27,7 +27,7 @@ async def thumb_handler(request: web.Request):
             logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "template", "logo.png")
             return web.FileResponse(logo_path)
         
-        client = multi_clients[0]
+        client = multi_clients[min(work_loads, key=work_loads.get)]
         file_bytes = await client.download_media(thumb_id, in_memory=True)
         return web.Response(body=file_bytes.getvalue(), content_type='image/jpeg')
     except InvalidHash as e:
@@ -70,6 +70,9 @@ async def stream_handler(request: web.Request):
         raise web.HTTPForbidden(text=e.message)
     except FIleNotFound as e:
         raise web.HTTPNotFound(text=e.message)
+    except Exception as e:
+        logging.exception("Failed rendering stream page")
+        raise web.HTTPInternalServerError(text=str(e))
 
 
 @routes.get("/dl/{path}", allow_head=True)
@@ -82,17 +85,17 @@ async def stream_handler(request: web.Request):
     except FIleNotFound as e:
         raise web.HTTPNotFound(text=e.message)
     except (AttributeError, BadStatusLine, ConnectionResetError):
-        pass
+        return web.Response(status=499, text="Client closed request")
     except Exception as e:
         traceback.print_exc()
-        logging.critical(e.with_traceback(None))
+        logging.critical(str(e))
         logging.debug(traceback.format_exc())
         raise web.HTTPInternalServerError(text=str(e))
 
 class_cache = {}
 
 async def media_streamer(request: web.Request, db_id: str):
-    range_header = request.headers.get("Range", 0)
+    range_header = request.headers.get("Range")
     
     index = min(work_loads, key=work_loads.get)
     faster_client = multi_clients[index]
@@ -121,7 +124,7 @@ async def media_streamer(request: web.Request, db_id: str):
         from_bytes = request.http_range.start or 0
         until_bytes = (request.http_range.stop or file_size) - 1
 
-    if (until_bytes > file_size) or (from_bytes < 0) or (until_bytes < from_bytes):
+    if (until_bytes >= file_size) or (from_bytes < 0) or (until_bytes < from_bytes):
         return web.Response(
             status=416,
             body="416: Range not satisfiable",
@@ -156,9 +159,13 @@ async def media_streamer(request: web.Request, db_id: str):
         body=body,
         headers={
             "Content-Type": f"{mime_type}",
-            "Content-Range": f"bytes {from_bytes}-{until_bytes}/{file_size}",
             "Content-Length": str(req_length),
             "Content-Disposition": f'{disposition}; filename="{file_name}"',
             "Accept-Ranges": "bytes",
+            **(
+                {"Content-Range": f"bytes {from_bytes}-{until_bytes}/{file_size}"}
+                if range_header
+                else {}
+            ),
         },
     )
