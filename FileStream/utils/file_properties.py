@@ -132,15 +132,31 @@ async def update_file_id(msg_id, multi_clients):
 
 
 async def send_file(client: Client, db_id, file_id: str, message):
-    file_caption = getattr(message, 'caption', None) or get_name(message)
-    log_msg = await client.send_cached_media(chat_id=Telegram.FLOG_CHANNEL, file_id=file_id,
-                                             caption=f'**{file_caption}**')
+    # Prefer copying the source message directly to preserve Telegram references
+    # for very large or special media where send_cached_media may fail.
+    log_msg = None
+    if message is not None:
+        try:
+            log_msg = await message.copy(chat_id=Telegram.FLOG_CHANNEL)
+        except Exception:
+            log_msg = None
 
-    if message.chat.type == ChatType.PRIVATE:
+    if log_msg is None:
+        file_caption = (
+            (getattr(message, "caption", None) if message is not None else None)
+            or (get_name(message) if message is not None else "File")
+        )
+        log_msg = await client.send_cached_media(
+            chat_id=Telegram.FLOG_CHANNEL,
+            file_id=file_id,
+            caption=f"**{file_caption}**",
+        )
+
+    if message and message.chat.type == ChatType.PRIVATE:
         await log_msg.reply_text(
             text=f"**RᴇQᴜᴇꜱᴛᴇᴅ ʙʏ :** [{message.from_user.first_name}](tg://user?id={message.from_user.id})\n**Uꜱᴇʀ ɪᴅ :** `{message.from_user.id}`\n**Fɪʟᴇ ɪᴅ :** `{db_id}`",
             disable_web_page_preview=True, parse_mode=ParseMode.MARKDOWN, quote=True)
-    else:
+    elif message:
         await log_msg.reply_text(
             text=f"**RᴇQᴜᴇꜱᴛᴇᴅ ʙʏ :** {message.chat.title} \n**Cʜᴀɴɴᴇʟ ɪᴅ :** `{message.chat.id}`\n**Fɪʟᴇ ɪᴅ :** `{db_id}`",
             disable_web_page_preview=True, parse_mode=ParseMode.MARKDOWN, quote=True)

@@ -54,6 +54,16 @@ async def private_receive_handler(bot: Client, message: Message):
         await bot.send_message(chat_id=Telegram.ULOG_CHANNEL,
                                text=f"Gᴏᴛ FʟᴏᴏᴅWᴀɪᴛ ᴏғ {str(e.value)}s ғʀᴏᴍ [{message.from_user.first_name}](tg://user?id={message.from_user.id})\n\n**ᴜsᴇʀ ɪᴅ :** `{str(message.from_user.id)}`",
                                disable_web_page_preview=True, parse_mode=ParseMode.MARKDOWN)
+    except Exception as e:
+        try:
+            await msg.edit_text(LANG.SOMETHING_WENT_WRONG, parse_mode=ParseMode.HTML)
+        except Exception:
+            pass
+        await bot.send_message(
+            chat_id=Telegram.ULOG_CHANNEL,
+            text=f"**#EʀʀᴏʀTʀᴀᴄᴋᴇʙᴀᴄᴋ:** `{e}`",
+            disable_web_page_preview=True,
+        )
 
 
 @FileStream.on_message(
