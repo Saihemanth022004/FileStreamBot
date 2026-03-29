@@ -15,11 +15,13 @@ from typing import (
 db = Database(Telegram.DATABASE_URL, Telegram.SESSION_NAME)
 
 
-async def send_optional_sticker(bot, chat_id: int, sticker_id: str):
+async def send_optional_sticker(bot, chat_id: int, sticker_id: str, delay_seconds: int = 3):
     if Telegram.NO_STICKERS or not sticker_id:
         return
     try:
-        await bot.send_sticker(chat_id=chat_id, sticker=sticker_id)
+        sticker_msg = await bot.send_sticker(chat_id=chat_id, sticker=sticker_id)
+        await asyncio.sleep(delay_seconds)
+        await sticker_msg.delete()
     except Exception:
         # Sticker failures should never break main bot flow.
         pass
