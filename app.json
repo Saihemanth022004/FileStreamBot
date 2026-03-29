@@ -97,6 +97,26 @@
       "description": "To set Image at Force Subscribe Verify. Defaults to pre-set image.",
       "required": false
     },
+    "START_STICKER": {
+      "description": "Animated sticker file_id for /start response (optional).",
+      "required": false
+    },
+    "PROCESSING_STICKER": {
+      "description": "Animated sticker file_id while processing uploads (optional).",
+      "required": false
+    },
+    "SUCCESS_STICKER": {
+      "description": "Animated sticker file_id after successful link generation (optional).",
+      "required": false
+    },
+    "ERROR_STICKER": {
+      "description": "Animated sticker file_id when an upload fails (optional).",
+      "required": false
+    },
+    "NO_STICKERS": {
+      "description": "Set True to disable all sticker responses without removing sticker IDs.",
+      "required": false
+    },
     "MODE": {
       "description": "Should be set to `secondary` if you only want to use the server for serving files.",
       "required": false

@@ -3,7 +3,7 @@ import math
 from FileStream import __version__
 from FileStream.bot import FileStream
 from FileStream.server.exceptions import FIleNotFound
-from FileStream.utils.bot_utils import gen_linkx, verify_user
+from FileStream.utils.bot_utils import gen_linkx, verify_user, send_optional_sticker
 from FileStream.config import Telegram
 from FileStream.utils.database import Database
 from FileStream.utils.translation import LANG, BUTTON
@@ -32,6 +32,7 @@ async def start(bot: Client, message: Message):
     usr_cmd = message.text.split("_")[-1]
 
     if usr_cmd == "/start":
+        await send_optional_sticker(bot, message.chat.id, Telegram.START_STICKER)
         await message.reply_text(
             text=LANG.START_TEXT.format(message.from_user.mention, FileStream.username),
             parse_mode=ParseMode.HTML,

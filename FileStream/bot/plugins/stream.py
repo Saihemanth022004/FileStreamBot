@@ -1,7 +1,7 @@
 
 import asyncio
 from FileStream.bot import FileStream, multi_clients
-from FileStream.utils.bot_utils import is_user_banned, is_user_exist, is_user_joined, gen_link, is_channel_banned, is_channel_exist, is_user_authorized
+from FileStream.utils.bot_utils import is_user_banned, is_user_exist, is_user_joined, gen_link, is_channel_banned, is_channel_exist, is_user_authorized, send_optional_sticker
 from FileStream.utils.database import Database
 from FileStream.utils.file_properties import get_file_ids, get_file_info
 from FileStream.config import Telegram
@@ -38,6 +38,7 @@ async def private_receive_handler(bot: Client, message: Message):
             return
 
     try:
+        await send_optional_sticker(bot, message.chat.id, Telegram.PROCESSING_STICKER)
         msg = await message.reply_text(LANG.PROCESSING_TEXT, quote=True, parse_mode=ParseMode.HTML)
         inserted_id = await db.add_file(get_file_info(message))
         await get_file_ids(False, inserted_id, multi_clients, message)
@@ -48,6 +49,7 @@ async def private_receive_handler(bot: Client, message: Message):
             disable_web_page_preview=True,
             reply_markup=reply_markup
         )
+        await send_optional_sticker(bot, message.chat.id, Telegram.SUCCESS_STICKER)
     except FloodWait as e:
         print(f"Sleeping for {str(e.value)}s")
         await asyncio.sleep(e.value)
@@ -59,6 +61,7 @@ async def private_receive_handler(bot: Client, message: Message):
             await msg.edit_text(LANG.SOMETHING_WENT_WRONG, parse_mode=ParseMode.HTML)
         except Exception:
             pass
+        await send_optional_sticker(bot, message.chat.id, Telegram.ERROR_STICKER)
         await bot.send_message(
             chat_id=Telegram.ULOG_CHANNEL,
             text=f"**#EʀʀᴏʀTʀᴀᴄᴋᴇʙᴀᴄᴋ:** `{e}`",

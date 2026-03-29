@@ -14,6 +14,16 @@ from typing import (
 
 db = Database(Telegram.DATABASE_URL, Telegram.SESSION_NAME)
 
+
+async def send_optional_sticker(bot, chat_id: int, sticker_id: str):
+    if Telegram.NO_STICKERS or not sticker_id:
+        return
+    try:
+        await bot.send_sticker(chat_id=chat_id, sticker=sticker_id)
+    except Exception:
+        # Sticker failures should never break main bot flow.
+        pass
+
 async def get_invite_link(bot, chat_id: Union[str, int]):
     try:
         invite_link = await bot.create_chat_invite_link(chat_id=chat_id)
