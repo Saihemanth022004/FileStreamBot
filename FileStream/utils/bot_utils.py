@@ -94,18 +94,14 @@ async def gen_link(_id):
         stream_text = LANG.STREAM_TEXT.format(file_name, file_size, download_link, page_link, file_link)
         reply_markup = InlineKeyboardMarkup(
             [
-                [InlineKeyboardButton("sᴛʀᴇᴀᴍ", url=page_link), InlineKeyboardButton("ᴅᴏᴡɴʟᴏᴀᴅ", url=download_link)],
-                [InlineKeyboardButton("Get File", url=file_link), InlineKeyboardButton("Delete Link", callback_data=f"msgdelpvt_{_id}")],
-                [InlineKeyboardButton("24h Expiry", callback_data=f"expire_{_id}"), InlineKeyboardButton("Close", callback_data="close")]
+                [InlineKeyboardButton("Stream", url=page_link), InlineKeyboardButton("Download", url=download_link)]
             ]
         )
     else:
         stream_text = LANG.STREAM_TEXT_X.format(file_name, file_size, download_link, page_link, file_link)
         reply_markup = InlineKeyboardMarkup(
             [
-                [InlineKeyboardButton("Stream", url=page_link), InlineKeyboardButton("Download", url=download_link)],
-                [InlineKeyboardButton("Get File", url=file_link), InlineKeyboardButton("Delete Link", callback_data=f"msgdelpvt_{_id}")],
-                [InlineKeyboardButton("24h Expiry", callback_data=f"expire_{_id}"), InlineKeyboardButton("Close", callback_data="close")]
+                [InlineKeyboardButton("Stream", url=page_link), InlineKeyboardButton("Download", url=download_link)]
             ]
         )
     return reply_markup, stream_text

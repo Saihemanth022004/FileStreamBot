@@ -6,6 +6,8 @@ from bson.errors import InvalidId
 from FileStream.server.exceptions import FIleNotFound
 
 class Database:
+    FILE_EXPIRY_SECONDS = 5 * 24 * 60 * 60
+
     def __init__(self, uri, database_name):
         self._client = motor.motor_asyncio.AsyncIOMotorClient(uri)
         self.db = self._client[database_name]
@@ -92,11 +94,10 @@ class Database:
             if not file_info:
                 raise FIleNotFound
             
-            if file_info.get("expires"):
-                if time.time() - file_info.get("time", 0) > 86400: # 24 hours
-                    await self.delete_one_file(file_info["_id"])
-                    await self.count_links(file_info['user_id'], "-")
-                    raise FIleNotFound
+            if time.time() - file_info.get("time", 0) > self.FILE_EXPIRY_SECONDS:
+                await self.delete_one_file(file_info["_id"])
+                await self.count_links(file_info['user_id'], "-")
+                raise FIleNotFound
 
             return file_info
         except InvalidId:

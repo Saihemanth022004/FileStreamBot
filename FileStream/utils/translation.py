@@ -50,7 +50,9 @@ Send me any file and I will handle the rest 🚀
 <code>{}</code>
 
 <b>Share link</b>
-<code>{}</code>"""
+<code>{}</code>
+
+<b>⚠️ Expiry:</b> This file link will expire automatically after <b>5 days</b>."""
 
     STREAM_TEXT_X = """
 <b>Your file is ready ✅</b>
@@ -65,7 +67,9 @@ Send me any file and I will handle the rest 🚀
 <code>{}</code>
 
 <b>Share link</b>
-<code>{}</code>"""
+<code>{}</code>
+
+<b>⚠️ Expiry:</b> This file link will expire automatically after <b>5 days</b>."""
 
     BAN_TEXT = "<b>Access denied 🚫</b>\n\nYou are currently banned from using this bot.\nIf you believe this is a mistake, <a href=\"tg://user?id={}\">contact the developer</a>."
     FORCE_SUB_TEXT = """
