@@ -61,6 +61,9 @@ Send me any file and I will handle the rest.
 <b>Download link</b>
 <code>{}</code>
 
+<b>Watch link</b>
+<code>{}</code>
+
 <b>Share link</b>
 <code>{}</code>"""
 
