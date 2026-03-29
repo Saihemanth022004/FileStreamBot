@@ -149,9 +149,14 @@ class Database:
         if operation == "-":
             await self.col.update_one({"id": id}, {"$inc": {"Links": -1}})
         elif operation == "+":
+            # Do not set Links in $setOnInsert while also using $inc on Links,
+            # MongoDB treats that as a conflicting update path.
             await self.col.update_one(
                 {"id": id},
-                {"$inc": {"Links": 1}, "$setOnInsert": self.new_user(id)},
+                {
+                    "$inc": {"Links": 1},
+                    "$setOnInsert": {"id": id, "join_date": time.time()},
+                },
                 upsert=True
             )
 
