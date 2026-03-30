@@ -131,8 +131,9 @@ async def my_files(bot: Client, message: Message):
             [InlineKeyboardButton("Empty", callback_data="N/A")],
         )
     file_list.append([InlineKeyboardButton("Close", callback_data="close")])
+    files_text = LANG.FILES_TEXT if total_files > 0 else LANG.FILES_TEXT_EMPTY
     await message.reply_text(
-        text=LANG.FILES_TEXT.format(total_files),
+        text=files_text,
         parse_mode=ParseMode.HTML,
         reply_markup=InlineKeyboardMarkup(file_list)
     )

@@ -5,37 +5,46 @@ from FileStream.config import Telegram
 class LANG(object):
 
     START_TEXT = """
-<b>Hey {} 👋</b>
+🚀 <b>/start</b>
+👋 Welcome to <b>Sai FileStream Bot</b> ⚡️
 
-<b>Welcome to FileStream ⚡</b>
-I can turn your Telegram files into clean, instant links for:
-• <b>direct download ⬇️</b>
-• <b>browser streaming ▶️</b>
-• <b>quick sharing 🔗</b>
+Turn your Telegram files into:
+• ⬇️ Direct download links
+• ▶️ Instant browser streaming
+• 🔗 Clean, shareable URLs
 
-Send me any file and I will handle the rest 🚀
+📂 Just send any file — I'll handle the rest.
 
-<b>Bot:</b> @{}"""
+⚡ Fast. Simple. Reliable.
+
+🔗 Share with friends: @{}"""
 
     HELP_TEXT = """
-<b>How To Use 🧭</b>
+🛠 <b>/help</b>
+🧠 How to use <b>Sai FileStream Bot</b>:
 
-<b>1.</b> Send a file in private chat 📩
-<b>2.</b> Wait a few seconds while I process it ⏳
-<b>3.</b> Tap buttons to stream, download, or share 🎬
+1️⃣ Send any file (video, document, etc.)
+2️⃣ Wait a few seconds ⏳
+3️⃣ Get your instant link 🔗
 
-<b>Extra:</b> add me as admin in a channel to generate links from channel posts.
+You can:
+• Download directly ⬇️
+• Stream in browser ▶️
+• Share anywhere 🔗
 
-<b>Support:</b> <a href="tg://user?id={}">contact the developer</a>
-<b>Note:</b> prohibited or abusive content is not allowed."""
+💡 Tip: Best for videos, PDFs, and large files"""
 
     ABOUT_TEXT = """
-<b>About FileStream 🤖</b>
+ℹ️ <b>/about</b>
+📢 About <b>Sai FileStream Bot</b> ⚡️
 
-<b>Name:</b> {}
-<b>Version:</b> {}
-<b>What it does:</b> creates fast stream and download links for Telegram files
-<b>Maintained by:</b> FileStream Admin"""
+This bot converts Telegram files into clean, usable links for streaming and sharing.
+
+⚡ Built for speed
+💡 Designed for simplicity
+🚀 Created by Sai
+
+Making file sharing effortless."""
 
     STREAM_TEXT = """
 <b>Your file is ready ✅</b>
@@ -77,9 +86,13 @@ Send me any file and I will handle the rest 🚀
 
 After joining, send your command or file again."""
     FILES_TEXT = """
-<b>Your Files</b>
+📂 <b>Your Recent Files:</b>
 
-<b>Total files:</b> {}"""
+👇 Select a file to view options."""
+    FILES_TEXT_EMPTY = """
+📂 <b>No files yet.</b>
+
+Send your first file and I'll convert it instantly ⚡"""
     FILE_DETAILS_TEXT = """
 <b>File Details</b>
 
