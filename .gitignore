@@ -121,8 +121,9 @@ dmypy.json
 test.py
 /test
 
+streambot.log
 streambot.log.*
 .idea/workspace.xml
 *.xml
-*.xml
-.idea/workspace.xml
+.qoder/
+.gemini/
